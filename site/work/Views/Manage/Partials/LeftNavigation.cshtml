@@ -1,0 +1,7 @@
+﻿@model QFlow.Models.ManageViewModels.ManageViewModel
+
+<ul class="add-nav">
+    <li class="@(Model.Scope == "clients" ? "active" : "")"><a asp-action="Clients">Clients</a></li>
+    <li class="@(Model.Scope == "managers" ? "active" : "")"><a asp-action="Managers">Managers</a></li>
+    <li class="@(Model.Scope == "alerts" ? "active" : "")"><a asp-action="Alerts">Alerts</a></li>
+</ul>

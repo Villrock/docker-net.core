@@ -1,0 +1,43 @@
+﻿<div class="modal-content">
+    <div class="clearfix">
+        <a href="#" class="btn-floating waves-effect waves-light modal-action modal-close right"><i class="material-icons">close</i></a>
+        <h4 class="modal-title">Edit {{scope}}</h4>
+    </div>
+    <form  v-on:submit.prevent="save">
+        <div class="row">
+            <div class="input-field col s6">
+                <input name="New_FirstName" id="New_FirstName" v-model="user.firstName" v-validate="'required'" type="text" :class="{ 'input-validation-error': errors.has('New_FirstName') }" maxlength="50"/>
+                <label for="New_FirstName">First Name</label>
+                <span v-show="errors.has('New_FirstName')" class="red-text">{{ setCorrectErrorName(errors.first('New_FirstName'), 'New_FirstName', 'First Name') }}</span>
+            </div>
+            <div class="input-field col s6">
+                <input name="New_LastName" id="New_LastName" v-model="user.lastName" v-validate="'required'" type="text" :class="{ 'input-validation-error': errors.has('New_LastName') }" maxlength="50"/>
+                <label for="New_LastName">Last Name</label>
+                <span v-show="errors.has('New_LastName')" class="red-text">{{ setCorrectErrorName(errors.first('New_LastName'), 'New_LastName', 'Last Name') }}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <input name="New_Email" id="New_Email" v-model="user.email" v-validate="'required|email'" type="email" :class="{ 'input-validation-error': errors.has('New_Email') }" maxlength="50"/>
+                <label for="New_Email">Email</label>
+                <span v-show="errors.has('New_Email')" class="red-text">{{ setCorrectErrorName(errors.first('New_Email'), 'New_Email', 'Email') }}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s6">
+                <input name="Password" id="Password" v-model="user.password" v-validate="'required|min:8'" type="password" :class="{ 'input-validation-error': errors.has('Password') }" maxlength="50"/>
+                <label for="Password">Password</label>
+                <span v-show="errors.has('Password')" class="red-text">{{ errors.first('Password') }}</span>
+            </div>
+            <div class="input-field col s6">
+                <input name="ConfirmPassword" id="ConfirmPassword" v-model="user.confirmPassword" v-validate="'required|confirmed:Password'" type="password" :class="{ 'input-validation-error': errors.has('ConfirmPassword') }" maxlength="50"/>
+                <label for="ConfirmPassword">Confirm Password</label>
+                <span v-show="errors.has('ConfirmPassword')" class="red-text">{{ setCorrectErrorName(errors.first('ConfirmPassword'), 'ConfirmPassword', 'Confirm Password') }}</span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn waves-effect waves-light" type="submit">Save {{scope}}</button>
+            <a href="#" class="modal-action modal-close waves-effect waves-light btn-flat">Cancel</a>
+        </div>
+    </form>
+</div>

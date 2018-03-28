@@ -1,0 +1,77 @@
+﻿@using QFlow.Data.Managers
+@using QFlow.Extensions
+@using QFlow.Models.DataModels.Requests
+@using QFlow.Models.HomeViewModals
+@inject RequestManager RequestManager
+@model RequestPageViewModel
+@{
+    Layout = "_LayoutMain";
+
+    ViewData["Title"] = "Requests";
+
+    var activeStatus = ( string )ViewData["ActiveStatusName"];
+    var statuses = await RequestManager.GetStatusesWithAllAsync() ?? Enumerable.Empty<RequestStatus>();
+
+}
+<div id="requests">
+    <div class="row">
+        <div class="col left">
+            @{
+                var index = 0;
+                foreach(var status in statuses)
+                {
+                    <input name="requestGroup" type="radio" id="status_@index" class="with-gap" @(status.Name == activeStatus ? "checked" : "") data-status="@status.Name" />
+                    <label for="status_@index" class="@(index > 0 ? "radio-content" : "")">@status.Name</label>
+                    index++;
+                }
+            }
+        </div>
+    </div>
+    <div class="row">
+        <div class="col s12">
+            <input name="searchRequest" id="searchRequest" type="text" v-model="searchRequest" placeholder="Type the text to search" style="width: 85%" />
+            <a class="waves-effect waves-light btn" style="float: right" v-on:click="reloadListWithPagingAndSearch()"><i class="material-icons left">search</i>Search</a>
+        </div>
+    </div>
+    <div class="card" v-show="requests.length > 0">
+        <table class="responsive-table bordered striped" v-cloak>
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Title</th>
+                    <th>Created</th>
+                    <th v-show="isManager">User</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(request, index) in requests">
+                    <td>{{request.requestNumber ? request.requestNumber : request.id}}</td>
+                    <td>{{request.title}}</td>
+                    <td>{{request.created}}</td>
+                    <td v-show="isManager">{{request.clientName}}</td>
+                    <td>
+                        <a href="#editRequestModal" class="waves-effect waves-light btn" v-on:click="edit(request.id)"><i class="material-icons left">edit</i>Edit</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="row">
+        @if(!User.IsManager())
+        {
+            <div class="col s2">
+                <a href="#editRequestModal" class="btn-floating waves-effect waves-light modal-trigger" v-on:click="setNew()"><i class="material-icons">add</i></a>
+            </div>
+        }
+        @{ await Html.RenderPartialAsync("_VuePaginationPartial"); }
+    </div>
+    <!-- edit popup -->
+    <div id="editRequestModal" class="modal" tabindex="-1">
+        @{ await Html.RenderPartialAsync("RequestForm"); }
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

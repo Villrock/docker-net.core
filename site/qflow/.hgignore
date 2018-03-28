@@ -1,0 +1,7 @@
+syntax: glob
+.vs
+obj
+bin
+Source/QFlow/Logs/*
+Source/QFlow/wwwroot/Brochures/*
+Source/QFlow/wwwroot/Resources/*

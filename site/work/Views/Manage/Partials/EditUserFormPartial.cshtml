@@ -1,0 +1,31 @@
+﻿<div class="modal-content">
+    <div class="clearfix">
+        <a href="#" class="btn-floating waves-effect waves-light modal-action modal-close right"><i class="material-icons">close</i></a>
+        <h4 class="modal-title">Edit {{scope}}</h4>
+    </div>
+    <form v-on:submit.prevent="save">
+        <div class="row">
+            <div class="input-field col s6">
+                <input name="FirstName" id="FirstName" v-model="user.firstName" v-validate="'required'" type="text" :class="{ 'input-validation-error': errors.has('FirstName') }" maxlength="50"/>
+                <label for="FirstName" v-bind:class="[{ 'active': user.firstName }]">First Name</label>
+                <span v-show="errors.has('FirstName')" class="red-text">{{ setCorrectErrorName(errors.first('FirstName'), 'FirstName', 'First Name') }}</span>
+            </div>
+            <div class="input-field col s6">
+                <input name="LastName" id="LastName" v-model="user.lastName" v-validate="'required'" type="text" :class="{ 'input-validation-error': errors.has('FirstName') }" maxlength="50"/>
+                <label for="LastName" v-bind:class="[{ 'active': user.lastName }]">Last Name</label>
+                <span v-show="errors.has('LastName')" class="red-text">{{ setCorrectErrorName(errors.first('LastName'), 'LastName', 'Last Name') }}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <input name="Email" id="Email" v-model="user.email" v-validate="'required|email'" type="email" :class="{ 'input-validation-error': errors.has('FirstName') }" maxlength="50"/>
+                <label for="Email" v-bind:class="[{ 'active': user.email }]">Email</label>
+                <span v-show="errors.has('Email')" class="red-text">{{ errors.first('Email') }}</span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn waves-effect waves-light" type="submit">Save {{scope}}</button>
+            <a href="#" class="modal-action modal-close waves-effect waves-light btn-flat">Cancel</a>
+        </div>
+    </form>
+</div>

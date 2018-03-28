@@ -1,0 +1,21 @@
+﻿<div class="col s10" v-show="pagingInfo.endPage > 1">
+    <ul class="pagination right">
+        <li class="waves-effect" v-show="pagingInfo.currentPage > 1">
+            <a v-on:click="reloadListWithPagingAndSearch({'page':1})">First</a>
+        </li>
+        <li class="waves-effect" v-show="pagingInfo.currentPage > 1">
+            <a v-on:click="reloadListWithPagingAndSearch({'page':(pagingInfo.currentPage - 1)})"><i class="material-icons">chevron_left</i></a>
+        </li>
+
+        <li v-for="(page, index) in pagingInfo.pages" v-bind:class="[{ 'active': page == pagingInfo.currentPage, 'waves-effect waves-light': page != pagingInfo.currentPage }]">
+            <a v-on:click="reloadListWithPagingAndSearch({'page':page})">{{page}}</a>
+        </li>
+
+        <li v-show="pagingInfo.currentPage < pagingInfo.totalPages">
+            <a class="waves-effect" v-on:click="reloadListWithPagingAndSearch({'page':pagingInfo.currentPage+1})"><i class="material-icons">chevron_right</i></a>
+        </li>
+        <li v-show="pagingInfo.currentPage < pagingInfo.totalPages">
+            <a class="waves-effect" v-on:click="reloadListWithPagingAndSearch({'page':pagingInfo.totalPages})">Last</a>
+        </li>
+    </ul>
+</div>

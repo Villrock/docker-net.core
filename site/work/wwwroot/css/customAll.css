@@ -1,0 +1,171 @@
+﻿[v-cloak] {
+    display: none;
+}
+
+input.input-validation-error {
+    border-bottom: 1px solid #F44336 !important;
+    box-shadow: 0 1px 0 0 #F44336 !important;
+}
+
+textarea.input-validation-error {
+    border-bottom: 1px solid #F44336 !important;
+    box-shadow: 0 1px 0 0 #F44336 !important;
+}
+
+span.red-text {
+    font-size: 12px;
+}
+
+a.bold {
+    font-weight: bold !important;
+}
+
+.drop-down-status {
+    margin: 5px 0;
+}
+
+.request-detail {
+    margin: 0 10px;
+}
+
+.remove-detail {
+    padding-top: 10px;
+    min-height: 40px;
+}
+
+.remove-detail a {
+    width: 30px;
+    height: 30px;
+}
+
+.remove-detail i {
+    line-height: 30px;
+}
+
+.avatar-col {
+    min-width: 50%;
+}
+
+.modal {
+    max-height: 80%;
+    width: 70%;
+}
+
+    .modal .modal-footer {
+        padding: 4px 0;
+    }
+
+.autocomplete-content {
+    min-width: 90%;
+    position: absolute;
+}
+
+.collection-item.avatar .edit-info {
+    padding: 4px 0 0 15px;
+}
+
+.time {
+    font-size: 14px;
+    display: block;
+    color: #838c91;
+}
+
+#alerts .card {
+    padding: 10px;
+}
+
+.radio-content {
+    margin-left: 20px;
+}
+
+.file-field .btn, .file-field .btn-large {
+    margin-top: 10px;
+}
+
+.picker__wrap {
+    margin-top: 10%;
+}
+
+.icon-with-text {
+    float: left;
+}
+
+#nav-mobile li strong {
+    margin-left: 10px;
+}
+
+.file-upload-modal {
+    width: 50%;
+}
+
+.input-text-for-file {
+    width: 95% !important;
+}
+
+.link-to-download {
+    width: 5%;
+}
+
+.file-size-error {
+    margin-bottom: 5px !important;
+}
+
+.content-link-to-brochure > .autocomplete-content {
+    margin-left: 100px;
+    min-width: 80%;
+}
+
+.main-loader {
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000
+}
+
+.spinner-green, .spinner-custom-color-only {
+    border-color: white;
+}
+
+#requests, #documentVault {
+    padding-top: 20px;
+}
+
+a[href="#editFileFormModalName"] {
+    margin-right: 20px;
+}
+
+.disabled-btn, .disabled-btn:hover {
+    background-color: #8e8e8e;
+    cursor: default;
+}
+
+    .disabled-btn span {
+        cursor: default;
+    }
+
+.cancel-right {
+    margin-right: 15px;
+}
+
+.card-container .card {
+    position: relative;
+}
+.card-container .card:before {
+    content: '';
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 40px 40px 0 0;
+    border-color: #ff9800 transparent transparent transparent;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+}

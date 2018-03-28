@@ -1,0 +1,33 @@
+[
+    {
+        "outputFileName": "wwwroot/css/site.min.css",
+        "inputFiles": [
+            "wwwroot/lib/materialize/styles/materialize.css",
+            "wwwroot/css/all.css",
+            "wwwroot/css/customAll.css"
+        ]
+    },
+    {
+        "outputFileName": "wwwroot/js/site.min.js",
+        "inputFiles": [
+            "wwwroot/js/main.js"
+        ],
+        "minify": {
+            "enabled": true,
+            "renameLocals": true
+        }
+    },
+    {
+        "outputFileName": "wwwroot/js/site.vue.min.js",
+        "inputFiles": [
+            "wwwroot/js/vue.requests.js",
+            "wwwroot/js/vue.manage.js",
+            "wwwroot/js/vue.alerts.js",
+            "wwwroot/js/vue.documents.js"
+        ],
+        "minify": {
+            "enabled": true,
+            "renameLocals": true
+        }
+    }
+]

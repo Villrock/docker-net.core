@@ -1,0 +1,32 @@
+version: '2'
+services:
+
+  # The Application
+  qflow_app:
+    build: .
+    command: dotnet run
+    volumes:
+      - ./site/work:/app
+    ports:
+      - 8000:80
+    environment:
+      ASPNETCORE_URLS: http://+:80
+      ASPNETCORE_ENVIRONMENT: Development
+
+
+
+  # The Database
+  mssql_database:
+    image: microsoft/mssql-server-linux
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Q1w2e3r4
+      - MSSQL_PID=Express
+    ports:
+      - 1433:1433
+    volumes:
+      - /home/v_skorov/docker/doker2/data:/var/opt/mssql/data
+
+volumes:
+  mssql_database:
+    driver: "local"

@@ -1,0 +1,392 @@
+﻿@using QFlow.Helper
+@model QFlow.Models.HomeViewModals.RequestPageViewModel
+
+<div class="modal-content">
+    <div class="clearfix">
+        <a href="#" class="btn-floating waves-effect waves-light modal-action modal-close right update-hash-url"><i class="material-icons">close</i></a>
+        <h4 class="modal-title">{{scope}} request</h4>
+    </div>
+    <form v-on:submit.prevent="update">
+        <div class="row">
+            <div class="col s3" v-show="isShowStatuses()">
+                <label for="statusesListId">Status</label>
+                <div class="drop-down-status">
+                    <ul id="statusesListId" class="dropdown-content">
+                        <li v-for="status in statuses">
+                            <a v-bind:class="[{ 'bold': (requestModel.status == status.id) }]"
+                               v-on:click="setStatus(status)"
+                               href="#">{{status.name}}</a>
+                        </li>
+                    </ul>
+                    <a class="dropdown-button btn" href="#" data-activates="statusesListId" :disabled="(statuses.length == 1)">
+                        {{requestModel.statusText}}
+                        <i class="material-icons right">arrow_drop_down</i>
+                    </a>
+                </div>
+            </div>
+            <div v-bind:class="[{ 's12': (isNew || (!isNew && !isShowStatuses())), 's9': (isShowStatuses() && !isNew) }, colClass, 'input-field']">
+                <label for="Title" v-bind:class="[{ 'active': requestModel.title }]">Title *</label>
+                <input name="Title" id="Title" v-model="requestModel.title" v-validate="'required|max:50|min:3'" type="text" :class="{ 'input-validation-error': errors.has('Title') }" maxlength="50" />
+                <span v-show="errors.has('Title')" class="red-text">{{ errors.first('Title') }}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s4 input-field" v-show="!isNew">
+                <div v-show="currentRequestStatus > 20">
+                    <label for="RequestNumber" v-bind:class="[{ 'active': requestModel.requestNumber }]">Request's Id</label>
+                    <input name="RequestNumber" id="RequestNumber" type="text" readonly v-model="requestModel.requestNumber" />
+                </div>
+                <div v-show="currentRequestStatus <= 20">
+                    <label for="RequestId" v-bind:class="[{ 'active': requestModel.id }]">Request's Id</label>
+                    <input name="RequestId" id="RequestId" type="text" readonly v-model="requestModel.id" />
+                </div>
+            </div>
+            <div v-bind:class="[{ 's6': isNew, 's4': !isNew }, colClass, 'input-field']">
+                <label for="DateStudy" v-bind:class="[{ 'active': requestModel.dateStudy }]">Date of study</label>
+                <input id="DateStudy" name="DateStudy" type="text" v-model="requestModel.dateStudy" :class="[{ 'input-validation-error': errors.has('DateStudy') }, datepickerClass]" />
+                <span v-show="errors.has('DateStudy')" class="red-text">{{ setCorrectErrorName(errors.first('DateStudy'), 'DateStudy', 'Date of study') }}</span>
+            </div>
+            <div v-bind:class="[{ 's6': isNew, 's4': !isNew }, colClass, 'input-field']">
+                <label for="DurationStudy" v-bind:class="[{ 'active': requestModel.durationStudy }]">Duration of study (duration in month)</label>
+                <input name="DurationStudy" id="DurationStudy" type="text" v-model="requestModel.durationStudy" :class="[{ 'input-validation-error': errors.has('DurationStudy') }]" maxlength="50" />
+                <span v-show="errors.has('DurationStudy')" class="red-text">{{ setCorrectErrorName(errors.first('DurationStudy'), 'DurationStudy', 'Duration of study') }}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <label for="FullAddress" v-bind:class="[{ 'active': requestModel.fullAddress }]">Full address including country</label>
+                <textarea name="FullAddress" id="FullAddress" v-model="requestModel.fullAddress" v-validate="'max:250|min:5'" :class="[{ 'input-validation-error': errors.has('FullAddress') }, textariaClass]" maxlength="250"></textarea>
+                <span v-show="errors.has('FullAddress')" class="red-text">{{ setCorrectErrorName(errors.first('FullAddress'), 'FullAddress', 'Full address including country') }}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <label for="SpecialInstructions" v-bind:class="[{ 'active': requestModel.specialInstructions }]">Special Instructions</label>
+                <textarea name="SpecialInstructions" id="SpecialInstructions" v-model="requestModel.specialInstructions" v-validate="'max:250|min:5'" :class="[{ 'input-validation-error': errors.has('SpecialInstructions') }, textariaClass]" maxlength="250"></textarea>
+                <span v-show="errors.has('SpecialInstructions')" class="red-text">{{ setCorrectErrorName(errors.first('SpecialInstructions'), 'SpecialInstructions', 'Special Instructions') }}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <label for="StudyInformation" v-bind:class="[{ 'active': requestModel.studyInformation }]">Study Information</label>
+                <textarea name="StudyInformation" id="StudyInformation" v-model="requestModel.studyInformation" v-validate="'max:250|min:5'" :class="[{ 'input-validation-error': errors.has('StudyInformation') }, textariaClass]" maxlength="250"></textarea>
+                <span v-show="errors.has('StudyInformation')" class="red-text">{{ setCorrectErrorName(errors.first('StudyInformation'), 'StudyInformation', 'Study Information') }}</span>
+            </div>
+        </div>
+        <h4>Request items</h4>
+        <div class="card-container">
+            <div class="card" v-for="(detail,index) in requestDetails">
+                <div class="request-detail">
+                    <div class="clearfix remove-detail">
+                        <a href="#" class="btn-floating waves-effect waves-light modal-action right" v-on:click="requestDetails.splice(index,1)" v-show="requestDetails.length > 1"><i class="material-icons">close</i></a>
+                    </div>
+                    <div class="row">
+                        <div v-bind:class="[{ 's6': currentRequestStatus > 10 || isManager, 's4': currentRequestStatus <= 10 && !isManager }, 'input-field', 'col']">
+                            <label :for="'Manufacturer' + index" v-bind:class="[{ 'active': detail.manufacturer }]">Manufacturer *</label>
+                            <input :name="'Manufacturer' + index" :id="'Manufacturer' + index" type="text" v-model="detail.manufacturer" v-validate="'required'" :class="[{ 'input-validation-error': errors.has('Manufacturer' + index) }, autocompleteClass]" v-on:keyup="changeManufacturerHandler($event, detail)" autocomplete="off" maxlength="50" />
+                            <span v-show="errors.has('Manufacturer' + index)" class="red-text">{{ setCorrectErrorName(errors.first('Manufacturer' + index), 'Manufacturer' + index, 'Manufacturer') }}</span>
+                        </div>
+                        <div v-bind:class="[{ 's6': currentRequestStatus > 10 || isManager, 's4': currentRequestStatus <= 10 && !isManager }, 'input-field', 'col']">
+                            <label :for="'Model' + index" v-bind:class="[{ 'active': detail.model }]">Model *</label>
+                            <input :name="'Model' + index" :id="'Model' + index" type="text" v-model="detail.model" v-validate="'required'" :class="[{ 'input-validation-error': errors.has('Model' + index) }, autocompleteClass]" v-on:keyup="changeModelHandler($event, detail)" autocomplete="off" maxlength="50" />
+                            <span v-show="errors.has('Model' + index)" class="red-text">{{ setCorrectErrorName(errors.first('Model' + index), 'Model' + index, 'Model') }}</span>
+                        </div>
+                        <div class="input-field col s4" v-show="currentRequestStatus <= 10 && !isManager">
+                            <label :for="'Quantity' + index" v-bind:class="[{ 'active': (detail.quantity || detail.quantity === 0)  }]">Quantity *</label>
+                            <input :id="'Quantity' + index" :name="'Quantity' + index" type="text" v-model="detail.quantity" :class="[{ 'input-validation-error': errors.has('Quantity' + index) }]" v-validate="'required|numeric'" maxlength="10" v-bind:disabled="!isManager && currentRequestStatus >= 30" />
+                            <span v-show="errors.has('Quantity' + index)" class="red-text">{{ setCorrectErrorName(errors.first('Quantity' + index), 'Quantity' + index, 'Quantity') }}</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <label :for="'ServiceWarrantyOptions' + index" v-bind:class="[{ 'active': detail.serviceWarrantyOptions }]">Service/Warranty options</label>
+                            <textarea :name="'ServiceWarrantyOptions' + index" :id="'ServiceWarrantyOptions' + index" v-model="detail.serviceWarrantyOptions" v-validate="'max:250|min:5'" :class="[{ 'input-validation-error': errors.has('ServiceWarrantyOptions' + index) }, textariaClass]" maxlength="250"></textarea>
+                            <span v-show="errors.has('ServiceWarrantyOptions' + index)" class="red-text">{{ setCorrectErrorName(errors.first('ServiceWarrantyOptions' + index), 'ServiceWarrantyOptions' + index, 'Service/Warranty Options') }}</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <label :for="'AncillaryItems' + index" v-bind:class="[{ 'active': detail.ancillaryItems }]">Ancillary Items</label>
+                            <textarea :name="'AncillaryItems' + index" :id="'AncillaryItems' + index" v-model="detail.ancillaryItems" v-validate="'max:250|min:5'" :class="[{ 'input-validation-error': errors.has('AncillaryItems' + index) }, textariaClass]" maxlength="250"></textarea>
+                            <span v-show="errors.has('AncillaryItems' + index)" class="red-text">{{ setCorrectErrorName(errors.first('AncillaryItems' + index), 'AncillaryItems' + index, 'Ancillary Items') }}</span>
+                        </div>
+                    </div>
+                    @* Quote fields *@
+                    <div v-show="currentRequestStatus >= 20 || (currentRequestStatus >= 10 && isManager)">
+                        <h5>Quoted</h5>
+                        <div class="row">
+                            <div class="input-field col s4">
+                                <label :for="'UnitPrice' + index" v-bind:class="[{ 'active': (detail.unitPrice || detail.unitPrice === 0)  }]">Unit Price</label>
+                                <input :id="'UnitPrice' + index" :name="'UnitPrice' + index" type="text" v-model="detail.unitPrice" :class="[{ 'input-validation-error': errors.has('UnitPrice' + index) }]" v-validate="'numeric'" maxlength="10" v-bind:disabled="!isManager" />
+                                <span v-show="errors.has('UnitPrice' + index)" class="red-text">{{ setCorrectErrorName(errors.first('UnitPrice' + index), 'UnitPrice' + index, 'UnitPrice') }}</span>
+                            </div>
+                            <div class="input-field col s4">
+                                <label :for="'Currency' + index" v-bind:class="[{ 'active': detail.currency }]">Currency</label>
+                                <input :name="'Currency' + index" :id="'Currency' + index" type="text" v-model="detail.currency" v-validate="'max:50'" :class="[{ 'input-validation-error': errors.has('Currency' + index) }, autocompleteClass]" v-on:keyup="changeCurrencyHandler($event, detail)" autocomplete="off" maxlength="50" v-bind:disabled="!isManager" />
+                                <span v-show="errors.has('Currency' + index)" class="red-text">{{ setCorrectErrorName(errors.first('Currency' + index), 'Currency' + index, 'Currency') }}</span>
+                            </div>
+                            <div class="input-field col s4">
+                                <label :for="'Quantity' + index" v-bind:class="[{ 'active': (detail.quantity || detail.quantity === 0)  }]">Quantity</label>
+                                <input :id="'Quantity' + index" :name="'Quantity' + index" type="text" v-model="detail.quantity" :class="[{ 'input-validation-error': errors.has('Quantity' + index) }]" v-validate="'numeric'" maxlength="10" v-bind:disabled="!isManager && currentRequestStatus >= 30" />
+                                <span v-show="errors.has('Quantity' + index)" class="red-text">{{ setCorrectErrorName(errors.first('Quantity' + index), 'Quantity' + index, 'Quantity') }}</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s3">
+                                <label :for="'ShippingDate' + index" v-bind:class="[{ 'active': detail.shippingDate }]">Shipping Date</label>
+                                <input :id="'ShippingDate' + index" :name="'ShippingDate' + index" type="text" v-model="detail.shippingDate" :class="[{ 'input-validation-error': errors.has('ShippingDate' + index), 'datepicker' : isManager }]" v-bind:disabled="!isManager" />
+                                <span v-show="errors.has('ShippingDate')" class="red-text">{{ setCorrectErrorName(errors.first('ShippingDate' + index), 'ShippingDate' + index, 'Shipping Date') }}</span>
+                            </div>
+                            <div class="input-field col s3">
+                                <label :for="'TrainingDate' + index" v-bind:class="[{ 'active': detail.trainingDate }]">Training Date</label>
+                                <input :id="'TrainingDate' + index" :name="'TrainingDate' + index" type="text" v-model="detail.trainingDate" :class="[{ 'input-validation-error': errors.has('TrainingDate' + index), 'datepicker' : isManager }]" v-bind:disabled="!isManager" />
+                                <span v-show="errors.has('TrainingDate' + index)" class="red-text">{{ setCorrectErrorName(errors.first('TrainingDate' + index), 'TrainingDate' + index, 'Training Date') }}</span>
+                            </div>
+                            <div class="input-field col s3">
+                                <label :for="'InstallationDate' + index" v-bind:class="[{ 'active': detail.installationDate }]">Installation Date</label>
+                                <input :id="'InstallationDate' + index" :name="'InstallationDate' + index" type="text" v-model="detail.installationDate" :class="[{ 'input-validation-error': errors.has('InstallationDate' + index), 'datepicker' : isManager }]" v-bind:disabled="!isManager" />
+                                <span v-show="errors.has('InstallationDate' + index)" class="red-text">{{ setCorrectErrorName(errors.first('InstallationDate'), 'InstallationDate', 'Installation Date') }}</span>
+                            </div>
+                            <div class="input-field col s3">
+                                <label :for="'EstimatedLeadTime' + index" v-bind:class="[{ 'active': detail.estimatedLeadTime }]">Estimated lead-time</label>
+                                <input :id="'EstimatedLeadTime' + index" :name="'EstimatedLeadTime' + index" type="text" v-model="detail.estimatedLeadTime" :class="[{ 'input-validation-error': errors.has('EstimatedLeadTime' + index), 'datepicker' : isManager }]" v-bind:disabled="!isManager" />
+                                <span v-show="errors.has('EstimatedLeadTime' + index)" class="red-text">{{ setCorrectErrorName(errors.first('EstimatedLeadTime'), 'EstimatedLeadTime', 'Estimated lead-time') }}</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <label :for="'ApprovalsCertificationRequired' + index" class="active">Approvals/Certification Required</label>
+                                <div class="file-field">
+                                    <div :class="[{ 'disabled-btn': !isManager }, 'btn']" v-on:click="uploadFile('ApprovalsCertificationRequired' + index, function(label){detail.approvalsCertificationRequired = label;})">
+                                        <span>File</span>
+                                    </div>
+                                    <input :id="'ApprovalsCertificationRequired' + index" :name="'ApprovalsCertificationRequired' + index" type="file" class="hide" :data-path="'@Consts.RESOURCES_FOLDER_NAME/' + detail.folderId" v-bind:disabled="!isManager">
+                                    <div class="file-path-wrapper">
+                                        <input type="text" v-model="detail.approvalsCertificationRequired" :class="[{ 'input-text-for-file': detail.approvalsCertificationRequired }]" readonly>
+                                        <div v-show="detail.hasApprovalsCertificationRequired" class="right link-to-download">
+                                            <a :href="'@Url.Action("Download", "Document")?filename='+ detail.approvalsCertificationRequired + '&folder=@Consts.RESOURCES_FOLDER_NAME/' + detail.folderId" target="_blank" class="secondary-content btn-floating">
+                                                <i class="material-icons">file_download</i>
+                                            </a>
+                                        </div>
+                                        <span class="red-text hide"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="input-field col s6 content-link-to-brochure">
+                                <label :for="'LinkToBrochure' + index" class="active">Link To Brochure</label>
+                                <div class="file-field">
+                                    <div :class="[{ 'disabled-btn': !isManager }, 'btn']" v-on:click="uploadFile('LinkToBrochure' + index, function(label){detail.linkToBrochure = label;})">
+                                        <span>new</span>
+                                    </div>
+                                    <input :id="'LinkToBrochure' + index" :name="'LinkToBrochure' + index" type="file" class="hide" data-path="@Consts.BROCHURE_FOLDER_NAME/" v-bind:disabled="!isManager">
+                                    <div class="file-path-wrapper">
+                                        <input type="text" v-model="detail.linkToBrochure" :class="[{ 'input-text-for-file': detail.hasLinkToBrochure }, 'autocomplete']" v-on:keyup="changeBrocureHandler($event, detail)" autocomplete="off" v-bind:disabled="!isManager">
+                                        <div v-show="detail.hasLinkToBrochure" class="right link-to-download">
+                                            <a :href="'@Url.Action("Download", "Document")?filename='+ detail.linkToBrochure" target="_blank" class="secondary-content btn-floating">
+                                                <i class="material-icons">file_download</i>
+                                            </a>
+                                        </div>
+                                        <span class="red-text hide"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <label :for="'CalibrationServiceRequirements' + index" v-bind:class="[{ 'active': detail.calibrationServiceRequirements }]">Calibration & Service requirements</label>
+                                <textarea :name="'CalibrationServiceRequirements' + index" :id="'CalibrationServiceRequirements' + index" v-model="detail.calibrationServiceRequirements" v-validate="'max:250|min:5'" :class="[{ 'input-validation-error': errors.has('CalibrationServiceRequirements' + index) }, textariaClass]" maxlength="250" v-bind:disabled="!isManager"></textarea>
+                                <span v-show="errors.has('StudyInformation' + index)" class="red-text">{{ setCorrectErrorName(errors.first('CalibrationServiceRequirements' + index), 'CalibrationServiceRequirements' + index, 'Calibration & Service requirements') }}</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <label :for="'AlternativesRecommendation' + index" v-bind:class="[{ 'active': detail.alternativesRecommendation }]">Alternatives Recommendation</label>
+                                <textarea :name="'AlternativesRecommendation' + index" :id="'AlternativesRecommendation' + index" v-model="detail.alternativesRecommendation" v-validate="'max:250|min:5'" :class="[{ 'input-validation-error': errors.has('AlternativesRecommendation' + index) }, textariaClass]" maxlength="250" v-bind:disabled="!isManager"></textarea>
+                                <span v-show="errors.has('AlternativesRecommendation' + index)" class="red-text">{{ setCorrectErrorName(errors.first('AlternativesRecommendation' + index), 'AlternativesRecommendation' + index, 'Calibration & Service requirements') }}</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <label :for="'LocalTechnicalSupport' + index" v-bind:class="[{ 'active': detail.localTechnicalSupport }]">Local technical support</label>
+                                <textarea :name="'LocalTechnicalSupport' + index" :id="'LocalTechnicalSupport' + index" v-model="detail.localTechnicalSupport" v-validate="'max:250|min:5'" :class="[{ 'input-validation-error': errors.has('LocalTechnicalSupport' + index) }, textariaClass]" maxlength="250" v-bind:disabled="!isManager"></textarea>
+                                <span v-show="errors.has('LocalTechnicalSupport' + index)" class="red-text">{{ setCorrectErrorName(errors.first('LocalTechnicalSupport' + index), 'LocalTechnicalSupport' + index, 'Local Technical Support') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-show="currentRequestStatus >= 30 || (currentRequestStatus >= 20 && isManager)">
+                        <div v-show="isManager">
+                            <h5>Purchase Order</h5>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                    <label :for="'SivRequiredDate' + index" v-bind:class="[{ 'active': detail.sivRequiredDate }]">SIV Required Date</label>
+                                    <input :id="'SivRequiredDate' + index" :name="'SivRequiredDate' + index" type="text" v-model="detail.sivRequiredDate" :class="[{ 'input-validation-error': errors.has('SivRequiredDate' + index), 'datepicker' : isManager }]" v-bind:disabled="!isManager" />
+                                    <span v-show="errors.has('SivRequiredDate + index')" class="red-text">{{ setCorrectErrorName(errors.first('SivRequiredDate' + index), 'SivRequiredDate' + index, 'SIV Required Date') }}</span>
+                                </div>
+                                <div class="input-field col s6">
+                                    <input :id="'SiteActivated' + index" :name="'SiteActivated' + index" type="checkbox" v-model="detail.siteActivated" :class="[{ 'input-validation-error': errors.has('SiteActivated' + index) }]" v-bind:disabled="!isManager" />
+                                    <label :for="'SiteActivated' + index">Site activated</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                    <label :for="'ServiceDueDate' + index" v-bind:class="[{ 'active': detail.serviceDueDate }]">Service Due Date</label>
+                                    <input :id="'ServiceDueDate' + index" :name="'ServiceDueDate' + index" type="text" v-model="detail.serviceDueDate" :class="[{ 'input-validation-error': errors.has('ServiceDueDate' + index), 'datepicker' : isManager }]" v-bind:disabled="!isManager" />
+                                    <span v-show="errors.has('ServiceDueDate' + index)" class="red-text">{{ setCorrectErrorName(errors.first('ServiceDueDate' + index), 'ServiceDueDate' + index, 'Service Due Date') }}</span>
+                                </div>
+                                <div class="input-field col s6">
+                                    <label :for="'DeInstallDueDate' + index" v-bind:class="[{ 'active': detail.deInstallDueDate }]">De-install Due Date</label>
+                                    <input :id="'DeInstallDueDate' + index" :name="'DeInstallDueDate' + index" type="text" v-model="detail.deInstallDueDate" :class="[{ 'input-validation-error': errors.has('DeInstallDueDate' + index), 'datepicker' : isManager }]" v-bind:disabled="!isManager" />
+                                    <span v-show="errors.has('DeInstallDueDate' + index)" class="red-text">{{ setCorrectErrorName(errors.first('DeInstallDueDate' + index), 'DeInstallDueDate' + index, 'De-install Due Date') }}</span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s12">
+                                    <label :for="'ContactPersons' + index" v-bind:class="[{ 'active': detail.contactPersons }]">Contact Person/s</label>
+                                    <textarea :name="'ContactPersons' + index" :id="'ContactPersons' + index" v-model="detail.contactPersons" v-validate="'max:250|min:5'" :class="[{ 'input-validation-error': errors.has('ContactPersons' + index) }, textariaClass]" maxlength="250" v-bind:disabled="!isManager"></textarea>
+                                    <span v-show="errors.has('ContactPersons')" class="red-text">{{ setCorrectErrorName(errors.first('ContactPersons' + index), 'ContactPersons' + index, 'Contact Person/s') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <h5>Shipping and Delivery Details</h5>
+                        <div class="row">
+                            <div class="input-field col s4">
+                                <label :for="'EstimateDeliveryDate' + index" v-bind:class="[{ 'active': detail.estimateDeliveryDate }]">Estimate delivery date</label>
+                                <input :id="'EstimateDeliveryDate' + index" :name="'EstimateDeliveryDate' + index" type="text" v-model="detail.estimateDeliveryDate" :class="[{ 'input-validation-error': errors.has('EstimateDeliveryDate' + index), 'datepicker' : isManager }]" v-bind:disabled="!isManager" />
+                                <span v-show="errors.has('EstimateDeliveryDate' + index)" class="red-text">{{ setCorrectErrorName(errors.first('EstimateDeliveryDate' + index), 'EstimateDeliveryDate' + index, 'Actual installation date') }}</span>
+                            </div>
+                            <div class="input-field col s4">
+                                <label :for="'TrackingNumberOrCourierDetails' + index" v-bind:class="[{ 'active': detail.trackingNumberOrCourierDetails }]">Tracking number or courier details</label>
+                                <input :name="'TrackingNumberOrCourierDetails' + index" :id="'TrackingNumberOrCourierDetails' + index" type="text" v-model="detail.trackingNumberOrCourierDetails" v-validate="'max:50'" :class="[{ 'input-validation-error': errors.has('TrackingNumberOrCourierDetails'+index) }, autocompleteClass]" maxlength="50" v-bind:disabled="!isManager" />
+                                <span v-show="errors.has('TrackingNumberOrCourierDetails')" class="red-text">{{ setCorrectErrorName(errors.first('TrackingNumberOrCourierDetails' + index), 'TrackingNumberOrCourierDetails' + index, 'Tracking number or courier details') }}</span>
+                            </div>
+                            <div class="input-field col s4">
+                                <label :for="'SerialNumber' + index" v-bind:class="[{ 'active': detail.serialNumber }]">Serial number</label>
+                                <input :id="'SerialNumber' + index" :name="'SerialNumber' + index" type="text" v-model="detail.serialNumber" :class="[{ 'input-validation-error': errors.has('SerialNumber' + index) }]" v-bind:disabled="!isManager" />
+                                <span v-show="errors.has('SerialNumber')" class="red-text">{{ setCorrectErrorName(errors.first('SerialNumber' + index), 'SerialNumber' + index, 'Serial number') }}</span>
+                            </div>
+                        </div>
+                        <div class="row" v-show="isManager">
+                            <div class="input-field col s12">
+                                <label :for="'NameOfPerson' + index" v-bind:class="[{ 'active': detail.nameOfPerson }]">Name of person who installation arranged with</label>
+                                <textarea :name="'NameOfPerson' + index" :id="'NameOfPerson' + index" v-model="detail.nameOfPerson" v-validate="'max:250|min:5'" :class="[{ 'input-validation-error': errors.has('NameOfPerson' + index) }, textariaClass]" maxlength="250" v-bind:disabled="!isManager"></textarea>
+                                <span v-show="errors.has('NameOfPerson')" class="red-text">{{ setCorrectErrorName(errors.first('NameOfPerson' + index), 'NameOfPerson' + index, 'Name Of Person') }}</span>
+                            </div>
+                        </div>
+                        <div class="row" v-show="isManager">
+                            <div class="input-field col s4">
+                                <label :for="'ConfirmedDeliveryDate' + index" v-bind:class="[{ 'active': detail.confirmedDeliveryDate }]">Confirmed delivery date</label>
+                                <input :id="'ConfirmedDeliveryDate' + index" :name="'ConfirmedDeliveryDate' + index" type="text" v-model="detail.confirmedDeliveryDate" :class="[{ 'input-validation-error': errors.has('ConfirmedDeliveryDate'), 'datepicker' : isManager }]" v-bind:disabled="!isManager" />
+                                <span v-show="errors.has('ConfirmedDeliveryDate' + index)" class="red-text">{{ setCorrectErrorName(errors.first('ConfirmedDeliveryDate' + index), 'ConfirmedDeliveryDate' + index, 'Confirmed delivery date') }}</span>
+                            </div>
+                            <div class="input-field col s4">
+                                <label :for="'ActualDespatchDate' + index" v-bind:class="[{ 'active': detail.actualDespatchDate }]">Actual despatch date</label>
+                                <input :id="'ActualDespatchDate' + index" :name="'ActualDespatchDate' + index" type="text" v-model="detail.actualDespatchDate" :class="[{ 'input-validation-error': errors.has('ActualDespatchDate' + index), 'datepicker' : isManager }]" v-bind:disabled="!isManager" />
+                                <span v-show="errors.has('ActualDespatchDate')" class="red-text">{{ setCorrectErrorName(errors.first('ActualDespatchDate' + index), 'ActualDespatchDate' + index, 'Actual despatch date') }}</span>
+                            </div>
+                            <div class="input-field col s4">
+                                <label :for="'ActualInstallationDate' + index" v-bind:class="[{ 'active': detail.actualInstallationDate }]">Actual installation date</label>
+                                <input :id="'ActualInstallationDate' + index" :name="'ActualInstallationDate' + index" type="text" v-model="detail.actualInstallationDate" :class="[{ 'input-validation-error': errors.has('ActualInstallationDate' + index), 'datepicker' : isManager }]" v-bind:disabled="!isManager" />
+                                <span v-show="errors.has('ActualInstallationDate' + index)" class="red-text">{{ setCorrectErrorName(errors.first('ActualInstallationDate' + index), 'ActualInstallationDate' + index, 'Actual installation date') }}</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <label :for="'TrainingDocuments' + index" class="active">Training documents</label>
+                                <div class="file-field">
+                                    <div :class="[{ 'disabled-btn': !isManager }, 'btn']" v-on:click="uploadFile('TrainingDocuments' + index, function(label){detail.trainingDocuments = label;})">
+                                        <span>File</span>
+                                    </div>
+                                    <input :id="'TrainingDocuments' + index" :name="'TrainingDocuments' + index" type="file" :data-path="'@Consts.RESOURCES_FOLDER_NAME/' + detail.folderId" class="hide" v-bind:disabled="!isManager">
+                                    <div class="file-path-wrapper">
+                                        <input type="text" v-model="detail.trainingDocuments" :class="[{ 'input-text-for-file': detail.trainingDocuments }]" readonly>
+                                        <div v-show="detail.hasTrainingDocuments" class="right link-to-download">
+                                            <a :href="'@Url.Action("Download", "Document")?filename='+ detail.trainingDocuments + '&folder=@Consts.RESOURCES_FOLDER_NAME/' + detail.folderId" target="_blank" class="secondary-content btn-floating">
+                                                <i class="material-icons">file_download</i>
+                                            </a>
+                                        </div>
+                                        <span class="red-text hide"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="input-field col s6">
+                                <label :for="'ProofOfDelivery' + index" class="active">Proof of Delivery</label>
+                                <div class="file-field">
+                                    <div :class="[{ 'disabled-btn': !isManager }, 'btn']" v-on:click="uploadFile('ProofOfDelivery' + index, function(label){detail.proofOfDelivery = label;})">
+                                        <span>File</span>
+                                    </div>
+                                    <input :id="'ProofOfDelivery' + index" :name="'ProofOfDelivery' + index" type="file" :data-path="'@Consts.RESOURCES_FOLDER_NAME/' + detail.folderId" class="hide" v-bind:disabled="!isManager">
+                                    <div class="file-path-wrapper">
+                                        <input type="text" v-model="detail.proofOfDelivery" :class="[{ 'input-text-for-file': detail.proofOfDelivery }]" readonly>
+                                        <div v-show="detail.hasProofOfDelivery" class="right link-to-download">
+                                            <a :href="'@Url.Action("Download", "Document")?filename=' + detail.proofOfDelivery + '&folder=@Consts.RESOURCES_FOLDER_NAME/' + detail.folderId" target="_blank" class="secondary-content btn-floating">
+                                                <i class="material-icons">file_download</i>
+                                            </a>
+                                        </div>
+                                        <span class="red-text hide"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-show="currentRequestStatus >= 40 || (currentRequestStatus >= 30 && isManager)">
+                        <h5>Invoiced</h5>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <label :for="'InvoiceFile' + index" class="active">Invoice File</label>
+                                <div class="file-field">
+                                    <div class="btn" v-on:click="uploadFile('InvoiceFile' + index, function(label){detail.invoiceFile = label;})">
+                                        <span>File</span>
+                                    </div>
+                                    <input :id="'InvoiceFile' + index" :name="'InvoiceFile' + index" type="file" :data-path="'@Consts.RESOURCES_FOLDER_NAME/' + detail.folderId" class="hide">
+                                    <div class="file-path-wrapper">
+                                        <input :id="'InvoiceFile-text' + index" type="text" v-model="detail.invoiceFile" :class="[{ 'input-text-for-file': detail.invoiceFile }]" readonly>
+                                        <div v-show="detail.hasInvoiceFile" class="right link-to-download">
+                                            <a :href="'@Url.Action("Download", "Document")?filename='+ detail.invoiceFile + '&folder=@Consts.RESOURCES_FOLDER_NAME/' + detail.folderId" target="_blank" class="secondary-content btn-floating">
+                                                <i class="material-icons">file_download</i>
+                                            </a>
+                                        </div>
+                                        <span :id="'InvoiceFile-text-error' + index" class="red-text hide">Please, add invoice file, before we change the state to invoice</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" v-show="currentRequestStatus >= 40 || (currentRequestStatus >= 30 && isManager)">
+                            <div class="input-field col s4" v-show="isManager">
+                                <label :for="'IssuedDate' + index" v-bind:class="[{ 'active': detail.issuedDate }]">Issued date</label>
+                                <input :id="'IssuedDate' + index" :name="'IssuedDate' + index" type="text" v-model="detail.issuedDate" :class="[{ 'input-validation-error': errors.has('IssuedDate' + index)}, 'datepicker' ]" />
+                                <span v-show="errors.has('IssuedDate' + index)" class="red-text">{{ setCorrectErrorName(errors.first('IssuedDate' + index), 'IssuedDate' + index, 'Issued date') }}</span>
+                            </div>
+                            <div class="input-field col s4">
+                                <label :for="'PaymentDueDate' + index" v-bind:class="[{ 'active': detail.paymentDueDate }]">Payment Due date</label>
+                                <input :id="'PaymentDueDate' + index" :name="'PaymentDueDate' + index" type="text" v-model="detail.paymentDueDate" :class="[{ 'input-validation-error': errors.has('PaymentDueDate' + index), 'datepicker' : isManager }]" v-bind:disabled="!isManager" />
+                                <span v-show="errors.has('DueDate')" class="red-text">{{ setCorrectErrorName(errors.first('PaymentDueDate' + index), 'PaymentDueDate' + index, 'Due date') }}</span>
+                            </div>
+                            <div class="input-field col s4">
+                                <label :for="'PaymentRunDate' + index" v-bind:class="[{ 'active': detail.paymentRunDate }]">Payment run date</label>
+                                <input :id="'PaymentRunDate' + index" :name="'PaymentRunDate' + index" type="text" v-model="detail.paymentRunDate" :class="[{ 'input-validation-error': errors.has('PaymentRunDate' + index) }, 'datepicker']" />
+                                <span v-show="errors.has('PaymentRunDate' + index)" class="red-text">{{ setCorrectErrorName(errors.first('PaymentRunDate' + index), 'PaymentRunDate' + index, 'Payment run date') }}</span>
+                            </div>
+                        </div>
+                        <div class="row" v-show="currentRequestStatus >= 40 || (currentRequestStatus >= 30 && isManager)">
+                            <div class="input-field col s6" v-show="isManager">
+                                <label :for="'PaymentReceivedDate' + index" v-bind:class="[{ 'active': detail.paymentReceivedDate }]">Payment received date</label>
+                                <input :id="'PaymentReceivedDate' + index" :name="'PaymentReceivedDate' + index" type="text" v-model="detail.paymentReceivedDate" :class="[{ 'input-validation-error': errors.has('PaymentReceivedDate' + index), 'datepicker' : isManager }]" />
+                                <span v-show="errors.has('PaymentReceivedDate' + index)" class="red-text">{{ setCorrectErrorName(errors.first('PaymentReceivedDate' + index), 'PaymentReceivedDate' + index, 'Payment received date') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @if(!Model.IsManager)
+        {
+            <div class="clearfix" v-show="currentRequestStatus < 30">
+                <a href="#" class="btn-floating waves-effect waves-light left" v-on:click="addDetail(requestModel)"><i class="material-icons">add</i></a>
+            </div>
+        }
+        <div class="modal-footer">
+            <button class="btn waves-effect waves-light" type="submit" name="action">Save request</button>
+            <a href="#" class="modal-action modal-close waves-effect waves-light btn-flat">Cancel</a>
+        </div>
+    </form>
+</div>

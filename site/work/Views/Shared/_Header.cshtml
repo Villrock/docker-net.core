@@ -1,0 +1,46 @@
+﻿@using QFlow.Data.Managers
+@using QFlow.Models.DataModels
+@using QFlow.Extensions
+@using QFlow.Services
+@inject UserManager<ApplicationUser> UserManager
+@inject AlertNotificationManager AlertNotificationManager
+@inject SettingsService Settings
+@{
+    var hasAlerts = await AlertNotificationManager.HasAlertsByEmail(User.Identity.Name);
+}
+
+<header id="header">
+    <div class="container">
+        <nav id="nav" class="full-width">
+            <div class="nav-wrapper">
+                <ul id="nav-mobile" class="left">
+                    <li>
+                        <a asp-controller="Request" asp-action="Index"><i class="material-icons icon-with-text">home</i><strong>Dashboard</strong></a>
+                    </li>
+                    <li>
+                        <a asp-controller="Document" asp-action="Index"><i class="material-icons icon-with-text">assignment</i><strong>Document Vault</strong></a>
+                    </li>
+                </ul>
+                <ul id="nav-mobile" class="right">
+                    @if(User.IsSuperUser(Settings.SuperUser))
+                    {
+                        <li>
+                            <a asp-controller="Manage" asp-action="Clients"><i class="material-icons">settings</i></a>
+                        </li>
+                    }
+                    <li class="@(hasAlerts ? "info" : "")">
+                        <a href="#" data-activates="notifications-out" class="notifications-toggle"><i class="material-icons">notifications</i></a>
+                    </li>
+                    <li>
+                        <div style="margin: 0 10px">
+                            <i class="material-icons icon-with-text">person</i><strong>@await UserManager.GetFullUserNameAsync(User)</strong>
+                        </div>
+                    </li>
+                    <li>
+                        <a asp-controller="Account" asp-action="Logout"><i class="material-icons">exit_to_app</i></a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+</header>

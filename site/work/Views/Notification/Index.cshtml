@@ -1,0 +1,24 @@
+﻿@using QFlow.Extensions
+@model QFlow.Models.NotificationViewModels.NotificationViewModel
+@{
+    ViewData["Title"] = "Notifications";
+    Layout = "_LayoutMain";
+}
+<div class="row">
+    <h2 class="center">Notifications</h2>
+    <ul class="notifications-list collection">
+        @foreach (var item in Model.Items)
+        {
+            <li class="collection-item avatar">
+                <i class="material-icons circle">person</i>
+                <p>
+                    @Html.Raw(item.Text)
+                    <span class="time">@item.Date.GetPrettyDate()</span>
+                </p>
+            </li>
+        }
+    </ul>
+</div>
+<div class="row">
+    @{ await Html.RenderPartialAsync("_PaginationPartial", Model.PageInfo); }
+</div>

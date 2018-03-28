@@ -1,0 +1,32 @@
+﻿@using QFlow.Data.Managers
+@using QFlow.Extensions
+@inject AlertNotificationManager AlertNotificationManager
+@{
+    var notifications = await AlertNotificationManager.GetAlertsNotificationByEmailAsync(User.Identity.Name, 12);
+}
+<div id="notifications-out" class="side-nav">
+    <strong class="heading"><b>Notifications</b>
+        <a href="#" class="notifications-close" data-activates="notifications-out"><i class="material-icons">close</i></a>
+    </strong>
+    <ul class="notifications-list collection">
+        @foreach (var notification in notifications)
+        {
+            <li class="collection-item avatar @(notification.IsRead ? "" : "active")">
+                <i class="material-icons circle">person</i>
+                <p>
+                    @Html.Raw(notification.Text)
+                    <span class="time">@notification.Date.GetPrettyDate()</span>
+                </p>
+            </li>
+        }
+        @if (notifications.Any())
+        {
+            <li class="collection-item">
+                <strong class="heading">
+                    <a asp-controller="Notification" asp-action="Index"><b>See All</b></a>
+                </strong>
+            </li>
+            <li class="collection-item"></li>
+        }
+    </ul>
+</div>

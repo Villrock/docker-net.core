@@ -1,0 +1,11 @@
+/app/bin/Debug/netcoreapp2.0/QFlow.deps.json
+/app/bin/Debug/netcoreapp2.0/QFlow.runtimeconfig.json
+/app/bin/Debug/netcoreapp2.0/QFlow.runtimeconfig.dev.json
+/app/bin/Debug/netcoreapp2.0/QFlow.dll
+/app/bin/Debug/netcoreapp2.0/QFlow.pdb
+/app/obj/Debug/netcoreapp2.0/QFlow.csproj.CoreCompileInputs.cache
+/app/obj/Debug/netcoreapp2.0/UserSecretsAssemblyInfo.cs
+/app/obj/Debug/netcoreapp2.0/QFlow.AssemblyInfoInputs.cache
+/app/obj/Debug/netcoreapp2.0/QFlow.AssemblyInfo.cs
+/app/obj/Debug/netcoreapp2.0/QFlow.dll
+/app/obj/Debug/netcoreapp2.0/QFlow.pdb

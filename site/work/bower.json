@@ -1,0 +1,11 @@
+{
+  "name": "asp.net",
+  "private": true,
+  "dependencies": {
+    "jquery-validation-unobtrusive": "3.2.6",
+    "jquery": "jQuery#2.1.4"
+  },
+  "resolutions": {
+    "jquery": ">=1.8"
+  }
+}

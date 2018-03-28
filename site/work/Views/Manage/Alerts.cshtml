@@ -1,0 +1,52 @@
+﻿@model QFlow.Models.ManageViewModels.ManageViewModel
+@{
+    ViewData["Title"] = "Alerts";
+    Layout = "_LayoutMain";
+}
+<div id="alerts" class="row" v-cloak>
+    <div class="col s3">
+        @await Html.PartialAsync("Partials/LeftNavigation", Model)
+    </div>
+    <div class="col s9">
+        <div class="card" v-for="(alert,index) in alerts">
+            <div class="row">
+                <div class="col s6">
+                    <div class="input-field">
+                        <label :for="'AlertType' + index" class="active">Name</label>
+                        <input :name="'AlertType' + index" :id="'AlertType' + index" readonly v-model="alert.name" />
+                    </div>
+                </div>
+                <div class="col s6">
+                    <div class="input-field">
+                        <label :for="'TimeAlert' + index" class="active">Notify for</label>
+                        <select :id="'TimeAlert' + index" v-model="alert.notifyDays" multiple>
+                            <option value="" disabled>Choose your option</option>
+                            <option v-for="time in notifyTimes" :value="time.id">{{time.name}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12">
+                    <div class="input-field">
+                        <label :for="'MessageOfAlertType' + index" class="active">Message</label>
+                        <textarea :name="'MessageOfAlertType' + index" :id="'MessageOfAlertType' + index" v-model="alert.message" v-validate="'required|max:250|min:5'" :class="[{ 'input-validation-error': errors.has('MessageOfAlertType' + index) }, textariaClass]" autofocus maxlength="250"></textarea>
+                        <span v-show="errors.has('MessageOfAlertType' + index)" class="red-text">{{ setCorrectErrorName(errors.first('MessageOfAlertType' + index), 'MessageOfAlertType' + index, 'Message') }}</span>
+                    </div>
+                    <div>
+                        <input type="checkbox" class="filled-in" :name="'IsSendingEmail' + index" :id="'IsSendingEmail' + index" v-model="alert.isSendingEmail" />
+                        <label :for="'IsSendingEmail' + index">Sending email with alert</label>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix">
+                <button class="btn waves-effect waves-light right" v-on:click="save(alert, index)">Save</button>
+                <a href="#" class="waves-effect waves-light btn-flat right cancel-right" v-on:click="cancel()">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

@@ -1,0 +1,40 @@
+﻿@using QFlow.Extensions
+@model QFlow.Models.DocumentViewModels.DocumentVaultViewModel
+@{
+    ViewData["Title"] = "Document Vault";
+    Layout = "~/Views/Shared/_LayoutMain.cshtml";
+}
+
+<div id="documentVault">
+    <div class="row">
+        <input name="searchRequest" id="searchRequest" type="text" v-model="searchRequest" placeholder="Type the text to search" style="width: 85%" />
+        <a class="waves-effect waves-light btn" style="float: right" v-on:click="reloadListWithPagingAndSearch()"><i class="material-icons left">search</i>Search</a>
+    </div>
+    <div class="row" v-cloak>
+        <ul class="collection" v-for="(doc, index) in documents">
+            <li class="collection-item">
+                <a :href="doc.path" target="_blank"><b>{{doc.name}}</b></a>
+                <a :href="'@Url.Action("Download", "Document")?filename='+ doc.name" class="secondary-content">
+                    <i class="material-icons">file_download</i>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="row">
+        <div class="col s2">
+            @if (User.IsManager())
+            {
+                <a href="#uploadFileFormModal" class="btn-floating waves-effect waves-light modal-trigger"><i class="material-icons">add</i></a>
+            }
+        </div>
+        @{ await Html.RenderPartialAsync("_VuePaginationPartial"); }
+    </div>
+
+    @if(User.IsManager())
+    {
+        <!-- add file popup -->
+        <div id="uploadFileFormModal" class="modal file-upload-modal" tabindex="-1">
+            @{ await Html.RenderPartialAsync("UploadFileForm"); }
+        </div>
+    }
+</div>
